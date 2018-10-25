@@ -9,70 +9,82 @@ const mongoose = require('mongoose');
 
 Users = require('./models/users');
 
-app.use(express.static(__dirname+'/client'));
+app.use(express.static(__dirname + '/client'));
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => res.send('Jai shree Ram'));
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
-app.get('/users', function(req, res) {
-    
-    
+app.get('/users', function (req, res) {
+
+
     //res.send('Welcome to Users page');
     console.log('In get users');
     Users.getUsers(function (err, users) {
 
-        if(err) {
+        if (err) {
             throw err;
         }
 
-        console.log('USERRRRRRRRRR - ' + users[0].userId);
+        console.log('USERRRRRRRRRR - ' + users[0]);
 
+        res.setHeader("Access-Control-Allow-Origin", "*");
         res.json(users);
     });
 });
 
-app.post('/verifyUser', function(req, res) {
-    
+app.post('/verifyUser', function (req, res) {
+
     //res.send('Welcome to verify user');
     console.log('In verifyUser');
 
     var inputVerifyUser = req.body;
     var userNameFromRequest = inputVerifyUser.userName
     var passwordFromReqeust = inputVerifyUser.password;
-    
+
     var password;
 
     Users.getUser(userNameFromRequest, function (err, user) {
 
-        if(err) {
+        if (err) {
             resMsg = err;
         } else {
 
             password = user[0].password;
 
-            if(passwordFromReqeust!=null && passwordFromReqeust === password) {
-                resMsg = {"Result":"Success"};
+            if (passwordFromReqeust != null && passwordFromReqeust === password) {
+                resMsg = { "Result": "Success" };
             } else {
-                resMsg = {"Result":"Failure"};
+                resMsg = { "Result": "Failure" };
             }
             //resMsg = 'userId - ' + user[0].userId + ' userName - ' + user[0].userName + ' password - ' + user[0].password;
         }
 
         console.log(resMsg);
+
+        // Website you wish to allow to connect
+        console.log('KAPPPPPPPIIIIIIIIIIILLLLLLLLLLLLLLL');
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        console.log('Access-Control-Allow-Origin - ' + res.header(Access-Control-Allow-Origin));
+        
+        // Request methods you wish to allow
+        //res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+        // Request headers you wish to allow
+        //res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
         
         res.json(resMsg);
     });
-    
+
 });
 
-app.post('/addUser', function(req, res) {
+app.post('/addUser', function (req, res) {
 
     var user = req.body;
     console.log('user - ' + req.body);
-    Users.addUser(user, function(err, user) {
-        if(err) {
+    Users.addUser(user, function (err, user) {
+        if (err) {
             console.error('Error occurred - ' + err);
             resMsg = err;
         } else {
@@ -82,5 +94,5 @@ app.post('/addUser', function(req, res) {
     });
 });
 
-mongoose.connect('mongodb://localhost/sosdb', {useNewUrlParser:true});
+mongoose.connect('mongodb://localhost/sosdb', { useNewUrlParser: true });
 var db = mongoose.connection;
